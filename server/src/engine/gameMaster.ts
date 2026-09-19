@@ -111,77 +111,75 @@ Player Question: "${question}"`
 function evaluateSemanticQuestion(q: string, char: Character): string {
   const attrs = char.attributes;
 
-  // Gender
-  if (/\b(male|man|guy|boy|he|him|his)\b/.test(q) && !/\b(female|woman|girl|she|her)\b/.test(q)) {
-    return attrs.gender === 'male' ? 'Yes, the character is male.' : 'No, the character is female.';
-  }
-  if (/\b(female|woman|girl|she|her)\b/.test(q)) {
-    return attrs.gender === 'female' ? 'Yes, the character is female.' : 'No, the character is male.';
-  }
-
-  // Protagonist / Main Character
-  if (/main\s+character|protagonist|lead(\s+character)?/i.test(q)) {
-    return attrs.isMainCharacter
-      ? "Yes, he's the central protagonist."
-      : "No, they are a vital supporting character.";
+  // 1. Superpowers / Magic / Abilities
+  if (/superpower|powers?|magic|supernatural|fly|alien|abilities|telekinesis/i.test(q)) {
+    return attrs.hasSuperpowers
+      ? 'Yes, possesses superhuman or magical abilities.'
+      : 'No superpowers, purely human.';
   }
 
-  // Villain / Antagonist / Bad Guy
-  if (/villain|bad\s+guy|antagonist|evil/i.test(q)) {
+  // 2. Villain / Antagonist / Bad Guy / Evil
+  if (/villain|bad\s+guy|antagonist|evil|corrupt/i.test(q)) {
     if (attrs.role === 'antagonist') return 'Yes, definitely a villain.';
-    if (attrs.role === 'anti-hero') return "Morally complicated — more of an anti-hero.";
-    return "No, not a villain.";
+    if (attrs.role === 'anti-hero') return 'Morally complicated — more of an anti-hero.';
+    return 'No, not a villain.';
   }
 
-  // Hero / Good Guy
-  if (/good\s+guy|hero/i.test(q)) {
-    if (attrs.role === 'protagonist') return 'Yes, the hero of the story.';
+  // 3. Hero / Good Guy
+  if (/good\s+guy|hero|virtuous/i.test(q)) {
+    if (attrs.role === 'protagonist') return 'Yes, the central hero of the story.';
     if (attrs.role === 'anti-hero') return 'He operates in a moral grey zone.';
     return 'No, far from a traditional good guy.';
   }
 
-  // Superpowers / Magic
-  if (/superpower|powers?|magic|supernatural|fly|alien/i.test(q)) {
-    return attrs.hasSuperpowers
-      ? 'Yes, possesses superhuman or magical abilities.'
-      : 'No, purely human with mortal abilities.';
+  // 4. Protagonist / Main Character / Lead
+  if (/main\s+character|protagonist|lead(\s+character)?/i.test(q)) {
+    return attrs.isMainCharacter
+      ? "Yes, the central protagonist of the story."
+      : "No, an iconic supporting character.";
   }
 
-  // Does character die?
-  if (/die|killed|dead|death|survive/i.test(q)) {
+  // 5. Does character die / alive / killed?
+  if (/die|killed|dead|death|survive|alive/i.test(q)) {
+    if (/alive|survive/i.test(q)) {
+      return attrs.isDead ? 'No, the character does not survive.' : 'Yes, the character is alive.';
+    }
     return attrs.isDead
       ? 'Yes, the character meets their demise.'
       : 'No, survives the main storyline.';
   }
 
-  // Media Type: Movie vs TV Show
-  if (/movie|film|cinema/i.test(q)) {
-    return char.mediaType === 'movie' ? 'Yes, from a legendary movie.' : 'No, from an acclaimed TV series.';
-  }
+  // 6. Media Type: Movie vs TV Show
   if (/tv(\s+show)?|series|television|episodes/i.test(q)) {
     return char.mediaType === 'tv' ? 'Yes, from an iconic TV series.' : 'No, this is a feature film.';
   }
+  if (/movie|film|cinema|theaters/i.test(q)) {
+    return char.mediaType === 'movie' ? 'Yes, from a legendary movie.' : 'No, from an acclaimed TV series.';
+  }
 
-  // Franchise / Sequels
-  if (/franchise|sequel|part\s+of\s+a\s+series|trilogy|marvel|dc|universe/i.test(q)) {
+  // 7. Franchise / Sequels / Universe
+  if (/franchise|sequel|part\s+of\s+a\s+series|trilogy|marvel|dc|universe|saga/i.test(q)) {
     return attrs.isFranchise
       ? 'Yes, part of a famous franchise or multi-part saga.'
       : 'No, a standalone work.';
   }
 
-  // Based on a book
-  if (/book|novel|comic|adapted/i.test(q)) {
+  // 8. Based on a book / Comic
+  if (/book|novel|comic|adapted|source\s+material/i.test(q)) {
     return attrs.basedOnBook
       ? 'Yes, adapted from a book or literary/comic work.'
       : 'No, an original screenplay.';
   }
 
-  // Era / Year
+  // 9. Era / Year / Decade
   if (/2000s|200[0-9]/i.test(q)) {
     return char.year >= 2000 && char.year < 2010 ? 'Yes, released in the 2000s.' : 'No, released in a different decade.';
   }
   if (/2010s|201[0-9]/i.test(q)) {
     return char.year >= 2010 && char.year < 2020 ? 'Yes, released in the 2010s.' : 'No, released in a different decade.';
+  }
+  if (/2020s|202[0-9]/i.test(q)) {
+    return char.year >= 2020 ? 'Yes, released in the 2020s.' : 'No, released earlier.';
   }
   if (/90s|199[0-9]/i.test(q)) {
     return char.year >= 1990 && char.year < 2000 ? 'Yes, a 1990s classic.' : 'No, not from the 1990s.';
@@ -196,10 +194,10 @@ function evaluateSemanticQuestion(q: string, char: Character): string {
     return char.year < 2000 ? 'Yes, released before the year 2000.' : 'No, released in 2000 or later.';
   }
   if (/after\s+2000|recent|modern/i.test(q)) {
-    return char.year >= 2000 ? 'Yes, 2000 or newer.' : 'No, released prior to 2000.';
+    return char.year >= 2000 ? 'Yes, released in 2000 or newer.' : 'No, released prior to 2000.';
   }
 
-  // Actor Nationality
+  // 10. Actor Nationality
   if (/american/i.test(q)) {
     return attrs.actorNationality.toLowerCase().includes('american')
       ? 'Yes, the actor is American.'
@@ -211,7 +209,7 @@ function evaluateSemanticQuestion(q: string, char: Character): string {
       : 'No, the actor is not British.';
   }
 
-  // Awards: Oscar or Emmy
+  // 11. Awards: Oscar or Emmy
   if (/oscar|academy\s+award/i.test(q)) {
     return attrs.actorWonOscar
       ? 'Yes, the actor has won an Academy Award (Oscar).'
@@ -223,38 +221,51 @@ function evaluateSemanticQuestion(q: string, char: Character): string {
       : 'No Emmy award for this actor.';
   }
 
-  // Genres
-  if (/crime|mafia|gangster|mob/i.test(q)) {
+  // 12. Genres
+  if (/crime|mafia|gangster|mob|cartel/i.test(q)) {
     return char.genres.includes('Crime')
       ? 'Yes, heavily involved with crime/underworld elements.'
       : 'No, not a crime story.';
   }
-  if (/sci-?fi|science\s+fiction|space|future/i.test(q)) {
+  if (/sci-?fi|science\s+fiction|space|future|time\s+travel/i.test(q)) {
     return char.genres.includes('Sci-Fi')
       ? 'Yes, rooted in science fiction.'
       : 'No, not sci-fi.';
   }
-  if (/action|guns?|fight/i.test(q)) {
+  if (/action|guns?|fight|combat/i.test(q)) {
     return char.genres.includes('Action')
       ? 'Yes, high action and intense combat.'
-      : 'No, not primarily an action movie.';
+      : 'No, not primarily an action title.';
   }
   if (/comedy|funny|humor/i.test(q)) {
     return char.genres.includes('Comedy')
       ? 'Yes, comedy plays a major role.'
       : 'No, it is a serious dramatic or suspense piece.';
   }
-  if (/fantasy|wizard|dragon/i.test(q)) {
+  if (/fantasy|wizard|dragon|magic/i.test(q)) {
     return char.genres.includes('Fantasy')
       ? 'Yes, set in a rich fantasy world.'
       : 'No, not fantasy.';
   }
-  if (/horror|scary|monster/i.test(q)) {
+  if (/horror|scary|monster|zombie/i.test(q)) {
     return char.genres.includes('Horror')
       ? 'Yes, contains horror and terror elements.'
-      : 'No, not a horror film.';
+      : 'No, not a horror work.';
   }
 
-  // General fallbacks based on character tags
+  // 13. Gender (Explicit Gender Questions ONLY!)
+  const isExplicitGenderQuestion = 
+    /\b(gender|sex)\b/i.test(q) ||
+    /\b(is|are)\s+(he|she|this|the\s+character)\s+(a\s+)?(male|female|man|woman|guy|girl)\b/i.test(q) ||
+    /^(male|female|man|woman)\??$/i.test(q);
+
+  if (isExplicitGenderQuestion) {
+    if (/\b(female|woman|girl)\b/i.test(q)) {
+      return attrs.gender === 'female' ? 'Yes, the character is female.' : 'No, the character is male.';
+    }
+    return attrs.gender === 'male' ? 'Yes, the character is male.' : 'No, the character is female.';
+  }
+
+  // General fallback based on character role
   return `That's an interesting question — ${attrs.isMainCharacter ? "focus on their central role in the story." : "think about the memorable characters around them."}`;
 }
