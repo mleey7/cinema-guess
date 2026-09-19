@@ -3,15 +3,22 @@
   "version": "1.0.0",
   "description": "Guess the Character & Actor - Discord Screen Share & Party Game",
   "scripts": {
-    "build:client": "cd client && npm run build",
-    "build:server": "cd server && npm run build",
-    "build": "npm run build:client && npm run build:server",
-    "start": "cd server && npm start",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build:client": "npm --prefix client run build",
+    "build:server": "npm --prefix server run build",
+    "build": "npm run install:all && npm run build:client && npm run build:server",
+    "start": "node server/dist/index.js",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "dev": "npm run start"
+    "dev": "npm start"
   },
-  "keywords": ["game", "guess-the-character", "discord-party-mode", "screen-share", "tiktok-creator"],
+  "keywords": [
+    "game",
+    "guess-the-character",
+    "discord-party-mode",
+    "screen-share",
+    "tiktok-creator"
+  ],
   "author": "",
   "license": "ISC"
 }
