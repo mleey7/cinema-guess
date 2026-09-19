@@ -1,0 +1,17 @@
+{
+  "name": "cinema-guess-master",
+  "version": "1.0.0",
+  "description": "Guess the Character & Actor - Discord Screen Share & Party Game",
+  "scripts": {
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:client && npm run build:server",
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npm run start"
+  },
+  "keywords": ["game", "guess-the-character", "discord-party-mode", "screen-share", "tiktok-creator"],
+  "author": "",
+  "license": "ISC"
+}

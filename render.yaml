@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cinema-guess-master
+    env: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
